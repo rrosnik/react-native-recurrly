@@ -1,11 +1,12 @@
+import { SafeAreaView } from '@/components/SafeAreaView';
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 
 const Insights = () => {
     return (
-        <View>
+        <SafeAreaView className='flex-1 bg-background p-5'>
             <Text>insights</Text>
-        </View>
+        </SafeAreaView>
     )
 }
 

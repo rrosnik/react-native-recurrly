@@ -1,4 +1,4 @@
-import { Link, useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams } from 'expo-router';
 import React from 'react';
 import { Text, View } from 'react-native';
 
@@ -7,7 +7,7 @@ const SubscriptionDetails = () => {
     return (
         <View>
             <Text>SubscriptionDetails</Text>
-            <Link href={"/"}>Go back</Link>
+            <Link href={"/(tabs)/index"}>Go back</Link>
         </View>
     )
 }
