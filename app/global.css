@@ -147,7 +147,7 @@
   }
 
   .sub-card {
-    @apply rounded-2xl border border-border p-4;
+    @apply rounded-tr-4xl rounded-bl-4xl border border-border p-4;
   }
 
   .sub-card-expanded {

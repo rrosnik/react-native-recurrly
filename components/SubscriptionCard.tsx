@@ -4,6 +4,7 @@ import React from 'react';
 import { Image, Pressable, Text, View } from 'react-native';
 
 const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps) => {
+    const fallback = "Not Provided";
     return (
         <Pressable onPress={onPress} className={clsx("sub-card",
             expanded ? "sub-card-expanded" : "bg-card"
@@ -18,7 +19,7 @@ const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps)
                     <View className='sub-copy'>
                         <Text numberOfLines={1} className='sub-title'>{data.name}</Text>
                         <Text numberOfLines={1} ellipsizeMode='tail' className='sub-meta'>{
-                            data.category?.trim() || data.plan?.trim() || (data.renewalDate ? formatSubscriptionDateTime(data.renewalDate) : '')
+                            data.category?.trim() || data.plan?.trim() || (data.renewalDate ? formatSubscriptionDateTime(data.renewalDate) : fallback)
 
                         }</Text>
                     </View>
@@ -35,33 +36,33 @@ const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps)
                         <View className='sub-row'>
                             <View className='sub-row-copy'>
                                 <Text className='sub-label'>Payment:</Text>
-                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.paymentMethod?.trim()}</Text>
+                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.paymentMethod?.trim() || fallback}</Text>
                             </View>
                         </View>
 
                         <View className='sub-row'>
                             <View className='sub-row-copy'>
                                 <Text className='sub-label'>Category:</Text>
-                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.category?.trim() || data.plan?.trim()}</Text>
+                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.category?.trim() || data.plan?.trim() || fallback}</Text>
                             </View>
                         </View>
                         <View className='sub-row'>
                             <View className='sub-row-copy'>
                                 <Text className='sub-label'>Started:</Text>
-                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.startDate ? formatSubscriptionDateTime(data.startDate) : ""}</Text>
+                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.startDate ? formatSubscriptionDateTime(data.startDate) : fallback}</Text>
                             </View>
                         </View>
                         <View className='sub-row'>
                             <View className='sub-row-copy'>
                                 <Text className='sub-label'>Renewal data:</Text>
-                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.renewalDate ? formatSubscriptionDateTime(data.renewalDate) : ""}</Text>
+                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.renewalDate ? formatSubscriptionDateTime(data.renewalDate) : fallback}</Text>
                             </View>
                         </View>
 
                         <View className='sub-row'>
                             <View className='sub-row-copy'>
                                 <Text className='sub-label'>Status:</Text>
-                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.status ? formatStatusLabel(data.status) : ""}</Text>
+                                <Text className='sub-value' numberOfLines={1} ellipsizeMode='tail' >{data.status ? formatStatusLabel(data.status) : fallback}</Text>
                             </View>
                         </View>
                     </View>
