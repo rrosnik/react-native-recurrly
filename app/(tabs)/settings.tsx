@@ -2,7 +2,7 @@ import { SafeAreaView } from '@/components/SafeAreaView';
 import React from 'react';
 import { Text } from 'react-native';
 
-const settings = () => {
+const Settings = () => {
     return (
         <SafeAreaView className='flex-1 bg-background p-5'>
             <Text>settings</Text>
@@ -10,4 +10,4 @@ const settings = () => {
     )
 }
 
-export default settings;
+export default Settings;

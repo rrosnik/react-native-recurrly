@@ -8,12 +8,13 @@ export const tabs: AppTab[] = [
 ];
 
 export const HOME_USER = {
-  name: "Adrian | JS Mastery",
+  name: "Reza",
+  title: "Frontend Engineer",
 };
 
 export const HOME_BALANCE = {
   amount: 2489.48,
-  nextRenewalDate: "2026-03-18T09:00:00.000Z",
+  nextRenewalDate: "2026-04-1T09:00:00.000Z",
 };
 
 export const UPCOMING_SUBSCRIPTIONS: UpcomingSubscription[] = [

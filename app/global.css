@@ -74,12 +74,16 @@
     @apply size-16 rounded-full;
   }
 
-  .home-user-name {
-    @apply ml-4 text-2xl font-sans-bold text-primary;
+  .home-user-name,
+  .home-user-title {
+    @apply ml-4 text-2xl font-sans-bold text-primary px-4;
+  }
+  .home-user-title {
+    @apply text-muted-foreground;
   }
 
   .home-add-icon {
-    @apply size-12;
+    @apply size-12 border border-gray-300 text-gray-300 rounded-full p-3;
   }
 
   .home-balance-card {
@@ -127,7 +131,7 @@
   }
 
   .upcoming-icon {
-    @apply size-14;
+    @apply size-14 p-3 bg-amber-100 rounded-xl;
   }
 
   .upcoming-price {
@@ -159,7 +163,7 @@
   }
 
   .sub-icon {
-    @apply size-16 rounded-lg;
+    @apply size-16 rounded-lg p-3 bg-white/40;
   }
 
   .sub-copy {
