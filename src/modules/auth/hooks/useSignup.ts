@@ -50,17 +50,15 @@ export const useSignup = () => {
   }, [setError, setStatus, setIsFetching, signUp]);
 
   const resendCode = useCallback(async () => {
-    return new Promise(async (resolve, reject) => {
-      if (status === "verifyEmailCode") {
-        const { error } = await signUp.verifications.sendEmailCode();
-        if (error) {
-          setError({ message: error.message });
-          reject(error);
-        } else {
-          resolve("Verification code resent successfully");
-        }
-      }
-    });
+    if (status !== "verifyEmailCode") {
+      throw new Error("Cannot resend code before verification step");
+    }
+    const { error } = await signUp.verifications.sendEmailCode();
+    if (error) {
+      setError({ message: error.message });
+      throw error;
+    }
+    return "Verification code resent successfully";
   }, [signUp, status]);
 
   const handleVerify = useCallback(async (code: string) => {

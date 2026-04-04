@@ -64,7 +64,11 @@ export const useLogin = () => {
         );
 
         if (emailCodeFactor) {
-          await signIn.mfa.sendEmailCode();
+          const { error } = await signIn.mfa.sendEmailCode();
+          if (error) {
+            setError({ message: error.message });
+            return;
+          }
           setStatus("needs_client_trust");
         } else {
           setError({ message: "Unsupported second factor strategy for email" });

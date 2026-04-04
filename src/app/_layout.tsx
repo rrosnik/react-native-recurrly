@@ -11,7 +11,10 @@ import { useEffect } from 'react';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-
+  const clerkPublishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!clerkPublishableKey) {
+    throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY");
+  }
 
   const [fontsLoaded] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
@@ -32,7 +35,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <ClerkProvider publishableKey={process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY!} tokenCache={tokenCache}>
+      <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
         <Stack screenOptions={{ headerShown: false }} />
       </ClerkProvider>
     </ThemeProvider>
