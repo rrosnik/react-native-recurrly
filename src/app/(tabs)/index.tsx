@@ -58,10 +58,7 @@ export default function App() {
                 renderItem={({ item }) => (<UpcomingSubscriptionCard data={item} />)}
                 showsHorizontalScrollIndicator={false}
                 ListEmptyComponent={<Text className='home-empty-state'>No upcoming renewals yet</Text>}
-              >
-
-
-              </FlatList>
+              />
             </View>
 
             <ListHeading title="All Subscriptions" />

@@ -5,6 +5,7 @@ import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from '@clerk/expo/token-cache';
 
 import "@/app/global.css";
+import { PostHogProviderWrapper } from '@/modules/posthog/providers/PosthogProvider';
 import { ThemeProvider } from '@/modules/theme/providers/them-provider';
 import { useEffect } from 'react';
 
@@ -19,16 +20,17 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
-      <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
-        <RootLayoutContent />
-      </ClerkProvider>
+      <PostHogProviderWrapper>
+        <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
+          <RootLayoutContent />
+        </ClerkProvider>
+      </PostHogProviderWrapper>
     </ThemeProvider>
   );
 }
 
 const RootLayoutContent = () => {
   const { isLoaded } = useAuth();
-
 
   const [fontsLoaded] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),

@@ -1,5 +1,6 @@
 import { useSignIn } from "@clerk/expo";
 import { useRouter } from "expo-router";
+import { usePostHog } from "posthog-react-native";
 import { useCallback, useEffect, useState } from "react";
 import { SignInData, signInSchema } from "../schema.ts";
 
@@ -10,6 +11,7 @@ export const useLogin = () => {
   const [status, setStatus] = useState<null | "needs_client_trust">(null);
 
   const router = useRouter();
+  const posthog = usePostHog();
 
   useEffect(() => {
     setIsFetching(fetchStatus === "fetching");
@@ -47,6 +49,9 @@ export const useLogin = () => {
               console.log(session?.currentTask);
               return;
             }
+            posthog.capture("user_logged_in", {
+              method: "email_code_mfa",
+            });
             router.push("/(tabs)");
           },
         });
@@ -118,6 +123,9 @@ export const useLogin = () => {
                 console.log(session?.currentTask);
                 return;
               }
+              posthog.capture("user_logged_in", {
+                method: "email_code_mfa",
+              });
               router.push("/(tabs)");
             },
           });

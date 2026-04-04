@@ -8,11 +8,11 @@ type IconProps = LucideProps & {
   as: LucideIcon;
 };
 
-function IconImpl({ as: IconComponent, ...props }: IconProps) {
+function _IconImpl({ as: IconComponent, ...props }: IconProps) {
   return <IconComponent {...props} />;
 }
 
-styled(IconImpl, {
+const IconImpl = styled(_IconImpl, {
   className: {
     target: 'style',
     nativeStyleMapping: {
