@@ -1,12 +1,20 @@
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
+import { SplashScreen, Stack, } from "expo-router";
 
+import { ClerkProvider } from "@clerk/expo";
+import { tokenCache } from '@clerk/expo/token-cache';
+
+import "@/app/global.css";
+import { ThemeProvider } from '@/modules/theme/providers/them-provider';
 import { useEffect } from 'react';
-import "./global.css";
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const clerkPublishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!clerkPublishableKey) {
+    throw new Error("Missing EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY");
+  }
 
   const [fontsLoaded] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
@@ -25,6 +33,11 @@ export default function RootLayout() {
 
   if (!fontsLoaded) return null;
 
-
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <ThemeProvider>
+      <ClerkProvider publishableKey={clerkPublishableKey} tokenCache={tokenCache}>
+        <Stack screenOptions={{ headerShown: false }} />
+      </ClerkProvider>
+    </ThemeProvider>
+  );
 }
