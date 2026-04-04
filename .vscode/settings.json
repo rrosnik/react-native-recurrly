@@ -10,6 +10,17 @@
   "tailwindCSS.classAttributes": [
     "class",
     "className",
-    "headerClassName"
+    "headerClassName",
+    "placeholderClassName"
+  ],
+  "tailwindCSS.experimental.classRegex": [
+    [
+      "cn\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ],
+    [
+      "cva\\(([^)]*)\\)",
+      "[\"'`]([^\"'`]*).*?[\"'`]"
+    ]
   ]
 }

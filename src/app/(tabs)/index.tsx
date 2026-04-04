@@ -7,17 +7,21 @@ import { HOME_BALANCE, HOME_SUBSCRIPTIONS, HOME_USER, UPCOMING_SUBSCRIPTIONS } f
 import { icons } from '@/constants/icons';
 import images from "@/constants/image";
 import { formatCurrency } from '@/lib/utils';
+import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
 import { useState } from 'react';
 import { FlatList, Image, Text, View } from 'react-native';
 
 
 export default function App() {
-
+  const { user, isSignedIn, isLoaded } = useUser();
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
 
+
+
+
   return (
-    <SafeAreaView className='flex-1 bg-background p-5'>
+    <SafeAreaView className='flex-1 dark:bg-accent bg-background  p-5' >
 
 
       <View className=''>
@@ -25,7 +29,7 @@ export default function App() {
           ListHeaderComponent={() => (<>
             <View className='home-header w-full'>
               <View className='home-user shrink'>
-                <Image source={images.avatar} className='home-avatar shrink-0' />
+                <Image source={user?.imageUrl ? { uri: user.imageUrl } : images.avatar} className='home-avatar shrink-0' />
                 <View className='flex-col shrink'>
                   <Text className='home-user-name'>{HOME_USER.name}</Text>
                   <Text className='home-user-title'>{HOME_USER.title}</Text>
@@ -75,10 +79,10 @@ export default function App() {
               expanded={item.id === expandedSubscriptionId}
               onPress={() => { setExpandedSubscriptionId(currentId => item.id === currentId ? null : item.id) }}
             />
-          )} 
+          )}
           contentContainerClassName='pb-30'
-          
-          />
+
+        />
 
       </View>
 

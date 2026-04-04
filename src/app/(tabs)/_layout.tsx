@@ -1,15 +1,18 @@
 import { tabs } from '@/constants/data';
 import clsx from "clsx";
-import { Tabs } from 'expo-router';
+import { Redirect, Tabs } from 'expo-router';
 import React from 'react';
-import { Image, StatusBar, View } from 'react-native';
+import { ActivityIndicator, Image, StatusBar, Text, View } from 'react-native';
 
+import { SafeAreaView } from '@/components/SafeAreaView';
 import { colors, components } from "@/constants/theme";
+import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const tabBar = components.tabBar;
 
 const TabLayout = () => {
+    const { isSignedIn, isLoaded } = useAuth()
 
     const insets = useSafeAreaInsets();
     const TabIcon = ({ focused, icon }: TabIconProps) => {
@@ -19,6 +22,19 @@ const TabLayout = () => {
             </View>
         </View>);
 
+    }
+
+    if (!isLoaded) {
+        return (
+            <SafeAreaView className='flex-1 items-center justify-center bg-accent'>
+                <Text className='text-foreground text-2xl'>Loading...</Text>
+                <ActivityIndicator className='mt-2' size="large" color="#666666" />
+            </SafeAreaView>
+        )
+    }
+
+    if (!isSignedIn) {
+        return <Redirect href="/(auth)/sign-in" />
     }
 
     return (
