@@ -5,9 +5,13 @@ import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from '@clerk/expo/token-cache';
 
 import "@/app/global.css";
+import { db } from '@/db';
+import migrations from '@/drizzle/migrations';
 import { PostHogProviderWrapper } from '@/modules/posthog/providers/PosthogProvider';
 import { ThemeProvider } from '@/modules/theme/providers/them-provider';
+import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useEffect, useRef } from 'react';
+import { Text, View } from 'react-native';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,6 +34,7 @@ export default function RootLayout() {
 }
 
 const RootLayoutContent = () => {
+  const { success, error } = useMigrations(db, migrations);
   const { isLoaded: authLoaded } = useAuth();
   const pathname = usePathname();
   const params = useGlobalSearchParams();
@@ -72,7 +77,16 @@ const RootLayoutContent = () => {
     }
   }, [fontsLoaded, authLoaded]);
 
-  if (!fontsLoaded || !authLoaded) return null;
+  if (error) {
+    console.error("Failed to run migrations:", error);
+    return (<View className='flex-1 items-center justify-center bg-white'>
+      <Text className='text-destructive text-lg'>An error occurred while initializing the app.</Text>
+      <Text className='text-muted-foreground text-sm mt-2'>Please try restarting the app. If the issue persists, contact support. </Text>
+      <Text className='text-muted-foreground text-sm mt-1'>Error details: {error.message}</Text>
+    </View>)
+  }
+
+  if (!fontsLoaded || !authLoaded || !success) return null;
   return (
     <Stack screenOptions={{ headerShown: false }} />
   )
