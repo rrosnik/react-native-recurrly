@@ -1,5 +1,5 @@
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, } from "expo-router";
+import { SplashScreen, Stack, useGlobalSearchParams, usePathname, } from "expo-router";
 
 import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from '@clerk/expo/token-cache';
@@ -7,7 +7,7 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import "@/app/global.css";
 import { PostHogProviderWrapper } from '@/modules/posthog/providers/PosthogProvider';
 import { ThemeProvider } from '@/modules/theme/providers/them-provider';
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -30,7 +30,30 @@ export default function RootLayout() {
 }
 
 const RootLayoutContent = () => {
-  const { isLoaded } = useAuth();
+  const { isLoaded: authLoaded } = useAuth();
+  const pathname = usePathname();
+  const params = useGlobalSearchParams();
+  const previousPathname = useRef<string | undefined>(undefined);
+
+  useEffect(() => {
+    if (previousPathname.current !== pathname) {
+      // Filter route params to avoid leaking sensitive data
+      const sanitizedParams = Object.keys(params).reduce((acc, key) => {
+        // Only include specific safe params
+        if (['id', 'tab', 'view'].includes(key)) {
+          acc[key] = params[key];
+        }
+        return acc;
+      }, {} as Record<string, string | string[]>);
+
+      // posthog.screen(pathname, {
+      //   previous_screen: previousPathname.current ?? null,
+      //   ...sanitizedParams,
+      // });
+      previousPathname.current = pathname;
+    }
+  }, [pathname, params]);
+
 
   const [fontsLoaded] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
@@ -43,12 +66,12 @@ const RootLayoutContent = () => {
 
   useEffect(() => {
     // hide the splash screen once fonts and auth state are loaded
-    if (fontsLoaded && isLoaded) {
+    if (fontsLoaded && authLoaded) {
       SplashScreen.hideAsync()
     }
-  }, [fontsLoaded, isLoaded]);
+  }, [fontsLoaded, authLoaded]);
 
-  if (!fontsLoaded || !isLoaded) return null;
+  if (!fontsLoaded || !authLoaded) return null;
   return (
     <Stack screenOptions={{ headerShown: false }} />
   )

@@ -1,3 +1,4 @@
+import { useSubscriptionModal } from '@/app/(tabs)/_layout';
 import "@/app/global.css";
 import ListHeading from '@/components/ListHeading';
 import { SafeAreaView } from '@/components/SafeAreaView';
@@ -9,21 +10,27 @@ import images from "@/constants/image";
 import { formatCurrency } from '@/lib/utils';
 import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
-import { useState } from 'react';
-import { FlatList, Image, Text, View } from 'react-native';
+import { useEffect, useState } from 'react';
+import { FlatList, Image, Pressable, Text, View } from 'react-native';
 
 
 export default function App() {
   const { user, isSignedIn, isLoaded } = useUser();
+  const { openModal, setOnSubmitCallback } = useSubscriptionModal();
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>(HOME_SUBSCRIPTIONS);
+
+  useEffect(() => {
+    setOnSubmitCallback((newSubscription: Subscription) => {
+      setSubscriptions(prevSubs => [newSubscription, ...prevSubs]);
+    });
+  }, [setOnSubmitCallback]);
 
 
 
 
   return (
-    <SafeAreaView className='flex-1 dark:bg-accent bg-background  p-5' >
-
-
+    <SafeAreaView  className='flex-1 dark:bg-accent bg-background  p-5' >
       <View className=''>
         <FlatList
           ListHeaderComponent={() => (<>
@@ -37,7 +44,9 @@ export default function App() {
                 </View>
               </View>
 
-              <Image source={icons.add} className='home-add-icon shrink-0' />
+              <Pressable onPress={openModal}>
+                <Image source={icons.add} className='home-add-icon shrink-0' />
+              </Pressable>
 
             </View>
             <View className='home-balance-card'>
@@ -65,7 +74,7 @@ export default function App() {
 
           </>)}
           keyExtractor={item => item.id}
-          data={HOME_SUBSCRIPTIONS}
+          data={subscriptions}
           extraData={expandedSubscriptionId}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => (<View className='h-4' />)}
@@ -82,7 +91,6 @@ export default function App() {
         />
 
       </View>
-
 
     </SafeAreaView>
   );
