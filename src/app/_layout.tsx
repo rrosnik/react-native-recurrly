@@ -35,6 +35,7 @@ const RootLayoutContent = () => {
   const params = useGlobalSearchParams();
   const previousPathname = useRef<string | undefined>(undefined);
 
+
   useEffect(() => {
     if (previousPathname.current !== pathname) {
       // Filter route params to avoid leaking sensitive data
