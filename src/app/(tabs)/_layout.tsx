@@ -1,18 +1,36 @@
 import { tabs } from '@/constants/data';
 import clsx from "clsx";
 import { Redirect, Tabs } from 'expo-router';
-import React from 'react';
+import React, { createContext, useState } from 'react';
 import { ActivityIndicator, Image, StatusBar, Text, View } from 'react-native';
 
+import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
 import { SafeAreaView } from '@/components/SafeAreaView';
 import { colors, components } from "@/constants/theme";
 import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+export const SubscriptionModalContext = createContext<{
+    isModalVisible: boolean;
+    openModal: () => void;
+    closeModal: () => void;
+    setOnSubmitCallback: (callback: (subscription: Subscription) => void) => void;
+} | null>(null);
+
+export const useSubscriptionModal = () => {
+    const context = React.useContext(SubscriptionModalContext);
+    if (!context) {
+        throw new Error('useSubscriptionModal must be used within tabs layout');
+    }
+    return context;
+};
+
 const tabBar = components.tabBar;
 
 const TabLayout = () => {
     const { isSignedIn, isLoaded } = useAuth()
+    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [subscriptionCallback, setSubscriptionCallback] = useState<(subscription: Subscription) => void>(() => { });
 
     const insets = useSafeAreaInsets();
     const TabIcon = ({ focused, icon }: TabIconProps) => {
@@ -23,6 +41,10 @@ const TabLayout = () => {
         </View>);
 
     }
+
+    const handleSetOnSubmitCallback = (callback: (subscription: Subscription) => void) => {
+        setSubscriptionCallback(() => callback);
+    };
 
     if (!isLoaded) {
         return (
@@ -38,7 +60,14 @@ const TabLayout = () => {
     }
 
     return (
-        <>
+        <SubscriptionModalContext.Provider
+            value={{
+                isModalVisible,
+                openModal: () => setIsModalVisible(true),
+                closeModal: () => setIsModalVisible(false),
+                setOnSubmitCallback: handleSetOnSubmitCallback,
+            }}
+        >
             <StatusBar barStyle="dark-content" backgroundColor="white" />
             <Tabs screenOptions={{
                 headerShown: false,
@@ -66,12 +95,21 @@ const TabLayout = () => {
                 {tabs.map(tab => (
                     <Tabs.Screen key={tab.name} name={tab.name} options={{
                         tabBarIcon: ({ focused }) => (
-                            <TabIcon focused={focused} icon={tab.icon} />
+                            <TabIcon key={tab.name} focused={focused} icon={tab.icon} />
                         )
                     }} />
                 ))}
             </Tabs>
-        </>
+
+            <CreateSubscriptionModal
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                onSubmit={(subscription) => {
+                    subscriptionCallback(subscription);
+                    setIsModalVisible(false);
+                }}
+            />
+        </SubscriptionModalContext.Provider>
     )
 }
 
