@@ -1,4 +1,5 @@
 import { icons } from '@/constants/icons';
+import { posthog } from '@/modules/posthog/config';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -71,6 +72,14 @@ export default function CreateSubscriptionModal({ visible, onClose, onSubmit }: 
         };
 
         onSubmit(subscription);
+
+        posthog.capture("subscription_created", {
+            subscription_name: name,
+            subscription_price: parseFloat(price),
+            subscription_category: category,
+            subscription_frequency: frequency,
+        });
+
         resetForm();
         onClose();
     };
