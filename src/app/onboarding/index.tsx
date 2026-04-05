@@ -14,13 +14,14 @@ const OnBoardingPage = () => {
     const handleCompleteOnboarding = async () => {
         setIsLoading(true);
         try {
-            // Save onboarding completion
-            await setOnboardingSeen({ ttl: 60 })
+            // Save onboarding completion (60 days TTL: 60 * 24 * 60 * 60 = 5184000 seconds)
+            await setOnboardingSeen({ ttl: 5184000 })
             // Navigate to main app
             router.replace('/(tabs)');
         } catch (error) {
             // TODO: Handle error (e.g. show toast)
             console.error('Failed to save onboarding state:', error);
+            return;
         } finally {
             setIsLoading(false);
         }

@@ -33,13 +33,13 @@ export const formatStatusLabel = (value?: string): string => {
   return value.charAt(0).toUpperCase() + value.slice(1);
 };
 
-export const HasSeenOnboardingKey = "has_seen_onboarding";
+export const HAS_SEEN_ONBOARDING_KEY = "has_seen_onboarding";
 type OnboardingSeenValue = {
   expiresAt: number | null;
 };
-export const HasSeenOnboarding = async (): Promise<boolean> => {
+export const hasSeenOnboarding = async (): Promise<boolean> => {
   try {
-    const value = await AsyncStorage.getItem(HasSeenOnboardingKey);
+    const value = await AsyncStorage.getItem(HAS_SEEN_ONBOARDING_KEY);
     if (!value) return false;
     const parsedValue: OnboardingSeenValue = JSON.parse(value);
     if (!parsedValue.expiresAt) return true;
@@ -55,10 +55,11 @@ export const setOnboardingSeen = async (options: {
   try {
     const expiresAt = options.ttl ? Date.now() + options.ttl * 1000 : null;
     await AsyncStorage.setItem(
-      HasSeenOnboardingKey,
+      HAS_SEEN_ONBOARDING_KEY,
       JSON.stringify({ expiresAt }),
     );
   } catch (error) {
     console.error("Failed to set onboarding seen:", error);
+    throw error;
   }
 };

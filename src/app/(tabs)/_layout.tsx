@@ -7,7 +7,7 @@ import { ActivityIndicator, Image, StatusBar, Text, View } from 'react-native';
 import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
 import { SafeAreaView } from '@/components/SafeAreaView';
 import { colors, components } from "@/constants/theme";
-import { HasSeenOnboarding } from '@/lib/utils';
+import { hasSeenOnboarding } from '@/lib/utils';
 import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -38,7 +38,7 @@ const TabLayout = () => {
 
     React.useEffect(() => {
         const checkOnboarding = async () => {
-            const hasSeen = await HasSeenOnboarding();
+            const hasSeen = await hasSeenOnboarding();
             setSeenOnboarding(hasSeen);
         };
         checkOnboarding();
@@ -56,6 +56,12 @@ const TabLayout = () => {
         setSubscriptionCallback(() => callback);
     }, []);
 
+    const contextValue = useMemo(() => ({
+        isModalVisible,
+        openModal: () => setIsModalVisible(true),
+        closeModal: () => setIsModalVisible(false),
+        setOnSubmitCallback: handleSetOnSubmitCallback,
+    }), [isModalVisible, handleSetOnSubmitCallback]);
 
     if (!isLoaded || seenOnboarding === null) {
         return (
@@ -66,23 +72,13 @@ const TabLayout = () => {
         )
     }
 
-    if (!seenOnboarding) {
-        return <Redirect href="/onboarding" />
-    }
-
     if (!isSignedIn) {
         return <Redirect href="/(auth)/sign-in" />
     }
 
-
-
-
-    const contextValue = useMemo(() => ({
-        isModalVisible,
-        openModal: () => setIsModalVisible(true),
-        closeModal: () => setIsModalVisible(false),
-        setOnSubmitCallback: handleSetOnSubmitCallback,
-    }), [isModalVisible, handleSetOnSubmitCallback]);
+    if (!seenOnboarding) {
+        return <Redirect href="/onboarding" />
+    }
 
     return (
         <SubscriptionModalContext.Provider
