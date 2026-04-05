@@ -1,3 +1,4 @@
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import { clsx, type ClassValue } from "clsx";
 import dayjs from "dayjs";
 import { twMerge } from "tailwind-merge";
@@ -30,4 +31,34 @@ export const formatSubscriptionDateTime = (value?: string): string => {
 export const formatStatusLabel = (value?: string): string => {
   if (!value) return "Unknown";
   return value.charAt(0).toUpperCase() + value.slice(1);
+};
+
+export const HasSeenOnboardingKey = "has_seen_onboarding";
+type OnboardingSeenValue = {
+  expiresAt: number | null;
+};
+export const HasSeenOnboarding = async (): Promise<boolean> => {
+  try {
+    const value = await AsyncStorage.getItem(HasSeenOnboardingKey);
+    if (!value) return false;
+    const parsedValue: OnboardingSeenValue = JSON.parse(value);
+    if (!parsedValue.expiresAt) return true;
+    return Date.now() < parsedValue.expiresAt;
+  } catch {
+    return false;
+  }
+};
+
+export const setOnboardingSeen = async (options: {
+  ttl: number;
+}): Promise<void> => {
+  try {
+    const expiresAt = options.ttl ? Date.now() + options.ttl * 1000 : null;
+    await AsyncStorage.setItem(
+      HasSeenOnboardingKey,
+      JSON.stringify({ expiresAt }),
+    );
+  } catch (error) {
+    console.error("Failed to set onboarding seen:", error);
+  }
 };

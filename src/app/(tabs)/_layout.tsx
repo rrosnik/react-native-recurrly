@@ -1,12 +1,13 @@
 import { tabs } from '@/constants/data';
 import clsx from "clsx";
 import { Redirect, Tabs } from 'expo-router';
-import React, { createContext, useState } from 'react';
+import React, { createContext, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, StatusBar, Text, View } from 'react-native';
 
 import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
 import { SafeAreaView } from '@/components/SafeAreaView';
 import { colors, components } from "@/constants/theme";
+import { HasSeenOnboarding } from '@/lib/utils';
 import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,8 +32,17 @@ const TabLayout = () => {
     const { isSignedIn, isLoaded } = useAuth()
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [subscriptionCallback, setSubscriptionCallback] = useState<(subscription: Subscription) => void>(() => { });
+    const [seenOnboarding, setSeenOnboarding] = useState<boolean | null>(null);
 
     const insets = useSafeAreaInsets();
+
+    React.useEffect(() => {
+        const checkOnboarding = async () => {
+            const hasSeen = await HasSeenOnboarding();
+            setSeenOnboarding(hasSeen);
+        };
+        checkOnboarding();
+    }, []);
     const TabIcon = ({ focused, icon }: TabIconProps) => {
         return (<View className='tabs-icon'>
             <View className={clsx("tabs-pill", focused && "tabs-active")}>
@@ -42,11 +52,12 @@ const TabLayout = () => {
 
     }
 
-    const handleSetOnSubmitCallback = (callback: (subscription: Subscription) => void) => {
+    const handleSetOnSubmitCallback = useCallback((callback: (subscription: Subscription) => void) => {
         setSubscriptionCallback(() => callback);
-    };
+    }, []);
 
-    if (!isLoaded) {
+
+    if (!isLoaded || seenOnboarding === null) {
         return (
             <SafeAreaView className='flex-1 items-center justify-center bg-accent'>
                 <Text className='text-foreground text-2xl'>Loading...</Text>
@@ -55,18 +66,27 @@ const TabLayout = () => {
         )
     }
 
+    if (!seenOnboarding) {
+        return <Redirect href="/onboarding" />
+    }
+
     if (!isSignedIn) {
         return <Redirect href="/(auth)/sign-in" />
     }
 
+
+
+
+    const contextValue = useMemo(() => ({
+        isModalVisible,
+        openModal: () => setIsModalVisible(true),
+        closeModal: () => setIsModalVisible(false),
+        setOnSubmitCallback: handleSetOnSubmitCallback,
+    }), [isModalVisible, handleSetOnSubmitCallback]);
+
     return (
         <SubscriptionModalContext.Provider
-            value={{
-                isModalVisible,
-                openModal: () => setIsModalVisible(true),
-                closeModal: () => setIsModalVisible(false),
-                setOnSubmitCallback: handleSetOnSubmitCallback,
-            }}
+            value={contextValue}
         >
             <StatusBar barStyle="dark-content" backgroundColor="white" />
             <Tabs screenOptions={{
