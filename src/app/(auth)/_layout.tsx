@@ -1,7 +1,7 @@
 import { Redirect, Stack } from "expo-router";
 
 import "@/app/global.css";
-import { ThemeProvider } from '@/modules/theme/providers/them-provider';
+import { ThemeProvider } from '@/providers/them-provider';
 import { useAuth } from '@clerk/expo';
 
 export default function RootLayout() {

@@ -7,8 +7,9 @@ import { tokenCache } from '@clerk/expo/token-cache';
 import "@/app/global.css";
 import { db } from '@/db';
 import migrations from '@/drizzle/migrations';
-import { PostHogProviderWrapper } from '@/modules/posthog/providers/PosthogProvider';
-import { ThemeProvider } from '@/modules/theme/providers/them-provider';
+import { AppQueryClientProvider } from '@/lib/query/QueryClientProvider';
+import { PostHogProviderWrapper } from '@/lib/posthog/providers/PosthogProvider';
+import { ThemeProvider } from '@/providers/them-provider';
 import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useEffect, useRef } from 'react';
 import { Text, View } from 'react-native';
@@ -88,6 +89,8 @@ const RootLayoutContent = () => {
 
   if (!fontsLoaded || !authLoaded || !success) return null;
   return (
-    <Stack screenOptions={{ headerShown: false }} />
+    <AppQueryClientProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </AppQueryClientProvider>
   )
 }

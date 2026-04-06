@@ -1,5 +1,5 @@
 import { icons } from '@/constants/icons';
-import { posthog } from '@/modules/posthog/config';
+import { posthog } from '@/lib/posthog/config';
 import clsx from 'clsx';
 import dayjs from 'dayjs';
 import React, { useState } from 'react';
@@ -8,7 +8,7 @@ import { KeyboardAvoidingView, Modal, Platform, Pressable, ScrollView, Text, Tex
 interface CreateSubscriptionModalProps {
     visible: boolean;
     onClose: () => void;
-    onSubmit: (subscription: Subscription) => void;
+    onSubmit: (subscription: Subscription_Insert) => void;
 }
 
 type Frequency = 'Monthly' | 'Yearly';
@@ -57,7 +57,7 @@ export default function CreateSubscriptionModal({ visible, onClose, onSubmit }: 
             ? now.add(1, 'month').toISOString()
             : now.add(1, 'year').toISOString();
 
-        const subscription: Subscription = {
+        const subscription: Subscription_Insert = {
             id: `sub_${Date.now()}`,
             name: name.trim(),
             price: parseFloat(price),

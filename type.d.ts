@@ -12,21 +12,9 @@ declare global {
     icon: ImageSourcePropType;
   }
 
-  interface Subscription {
-    id: string;
-    icon: ImageSourcePropType;
-    name: string;
-    plan?: string;
-    category?: string;
-    paymentMethod?: string;
-    status?: string;
-    startDate?: string;
-    price: number;
-    currency?: string;
-    billing: string;
-    renewalDate?: string;
-    color?: string;
-  }
+  type Subscription = import("@/db/schema/subscriptions").Subscription;
+  type Subscription_Insert =
+    import("@/db/schema/subscriptions").Subscription_Insert;
 
   interface SubscriptionCardProps extends Omit<Subscription, "id"> {
     expanded: boolean;

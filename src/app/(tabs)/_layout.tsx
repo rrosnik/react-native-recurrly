@@ -4,10 +4,10 @@ import { Redirect, Tabs } from 'expo-router';
 import React, { createContext, useCallback, useMemo, useState } from 'react';
 import { ActivityIndicator, Image, StatusBar, Text, View } from 'react-native';
 
-import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
 import { SafeAreaView } from '@/components/SafeAreaView';
 import { colors, components } from "@/constants/theme";
 import { hasSeenOnboarding } from '@/lib/utils';
+import CreateSubscriptionModal from '@/modules/subscription/ui/components/CreateSubscriptionModal';
 import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -31,7 +31,7 @@ const tabBar = components.tabBar;
 const TabLayout = () => {
     const { isSignedIn, isLoaded } = useAuth()
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [subscriptionCallback, setSubscriptionCallback] = useState<(subscription: Subscription) => void>(() => { });
+    const [subscriptionCallback, setSubscriptionCallback] = useState<(subscription: Subscription_Insert) => void>(() => { });
     const [seenOnboarding, setSeenOnboarding] = useState<boolean | null>(null);
 
     const insets = useSafeAreaInsets();

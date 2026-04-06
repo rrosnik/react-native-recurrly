@@ -2,12 +2,12 @@ import { useSubscriptionModal } from '@/app/(tabs)/_layout';
 import "@/app/global.css";
 import ListHeading from '@/components/ListHeading';
 import { SafeAreaView } from '@/components/SafeAreaView';
-import SubscriptionCard from '@/components/SubscriptionCard';
-import UpcomingSubscriptionCard from '@/components/UpcomingSubscriptionCard';
 import { HOME_BALANCE, HOME_SUBSCRIPTIONS, HOME_USER, UPCOMING_SUBSCRIPTIONS } from '@/constants/data';
 import { icons } from '@/constants/icons';
 import images from "@/constants/image";
 import { formatCurrency } from '@/lib/utils';
+import SubscriptionCard from '@/modules/subscription/ui/components/SubscriptionCard';
+import UpcomingSubscriptionCard from '@/modules/subscription/ui/components/UpcomingSubscriptionCard';
 import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
@@ -25,7 +25,7 @@ export default function App() {
       setSubscriptions(prevSubs => [newSubscription, ...prevSubs]);
     });
   }, [setOnSubmitCallback]);
-
+2
 
 
 
