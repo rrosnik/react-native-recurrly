@@ -1,4 +1,3 @@
-import { useSubscriptionModal } from '@/app/(tabs)/_layout';
 import "@/app/global.css";
 import ListHeading from '@/components/ListHeading';
 import { SafeAreaView } from '@/components/SafeAreaView';
@@ -10,24 +9,14 @@ import SubscriptionCard from '@/modules/subscription/ui/components/SubscriptionC
 import UpcomingSubscriptionCard from '@/modules/subscription/ui/components/UpcomingSubscriptionCard';
 import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { FlatList, Image, Pressable, Text, View } from 'react-native';
 
 
 export default function App() {
-  const { user, isSignedIn, isLoaded } = useUser();
-  const { openModal, setOnSubmitCallback } = useSubscriptionModal();
+  const { user } = useUser();
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(HOME_SUBSCRIPTIONS);
-
-  useEffect(() => {
-    setOnSubmitCallback((newSubscription: Subscription) => {
-      setSubscriptions(prevSubs => [newSubscription, ...prevSubs]);
-    });
-  }, [setOnSubmitCallback]);
-2
-
-
 
   return (
     <SafeAreaView  className='flex-1 dark:bg-accent bg-background  p-5' >
@@ -44,7 +33,7 @@ export default function App() {
                 </View>
               </View>
 
-              <Pressable onPress={openModal}>
+              <Pressable >
                 <Image source={icons.add} className='home-add-icon shrink-0' />
               </Pressable>
 
