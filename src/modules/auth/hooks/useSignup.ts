@@ -79,7 +79,7 @@ export const useSignup = () => {
             return;
           }
 
-          router.push("/(tabs)");
+          router.replace("/(tabs)");
         },
       });
       if (error) {

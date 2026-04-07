@@ -52,7 +52,7 @@ export const useLogin = () => {
             posthog.capture("user_logged_in", {
               method: "email_code_mfa",
             });
-            router.push("/(tabs)");
+            router.replace("/(tabs)");
           },
         });
       } else if (signIn.status === "needs_second_factor") {
@@ -126,7 +126,7 @@ export const useLogin = () => {
               posthog.capture("user_logged_in", {
                 method: "email_code_mfa",
               });
-              router.push("/(tabs)");
+              router.replace("/(tabs)");
             },
           });
           if (error) {

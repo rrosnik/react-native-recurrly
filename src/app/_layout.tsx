@@ -17,7 +17,6 @@ import { useEffect } from 'react';
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  console.log('Rendering RootLayout');
 
   const clerkPublishableKey = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
   if (!clerkPublishableKey) {
@@ -36,7 +35,6 @@ export default function RootLayout() {
 }
 
 const RootLayoutContent = () => {
-  console.log('Rendering RootLayoutContent');
   const { success, error: errorMigrations } = useMigrations(db, migrations);
   const { isLoaded: authLoaded } = useAuth();
   const [fontsLoaded, errorFonts] = useFonts({
@@ -50,10 +48,10 @@ const RootLayoutContent = () => {
 
   useEffect(() => {
     // hide the splash screen once fonts and auth state are loaded
-    if (fontsLoaded && authLoaded) {
+    if (fontsLoaded && authLoaded && success) {
       SplashScreen.hideAsync()
     }
-  }, [fontsLoaded, authLoaded]);
+  }, [fontsLoaded, authLoaded, success]);
 
   if (errorMigrations) {
     return <ErrorState title="Database Error" message="An error occurred while initializing the database. Please try restarting the app. If the issue persists, contact support." />
@@ -64,9 +62,11 @@ const RootLayoutContent = () => {
   }
 
   if (!fontsLoaded || !authLoaded || !success) return null;
+
   return (
     <AppQueryClientProvider>
       <Stack screenOptions={{ headerShown: false }} />
     </AppQueryClientProvider>
   )
+
 }

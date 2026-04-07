@@ -7,8 +7,11 @@ import { Image, ImageSourcePropType, Pressable, StatusBar, View } from 'react-na
 import LoadingState from '@/components/LoadingState';
 import { components } from "@/constants/theme";
 import { cn } from '@/lib/utils';
+import { onBoardingStore } from '@/modules/onboarding/hooks/useOnBoardingStorage';
 import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useStore } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 
 export const SubscriptionModalContext = createContext<{
     isModalVisible: boolean;
@@ -47,10 +50,6 @@ const TabIcon = React.memo(({ focused, icon }: TabIconProps) => {
 const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
     const safeInsets = useSafeAreaInsets();
 
-    console.log('Rendering CustomTabBar with state index:');
-    console.log('Rendering CustomTabBar with state index:', state);
-    console.log('Rendering CustomTabBar with state index:', descriptors);
-    console.log('Rendering CustomTabBar with state index:', navigation);
     return (
         <View
             className={cn("absolute h-20  flex-row items-center  mx-5 p-0 rounded-full bg-primary",
@@ -108,9 +107,15 @@ const tabScreens = () => tabs.map((tab) => (
 ))
 const TabLayout = () => {
     const { isSignedIn, isLoaded } = useAuth();
+    const { value, isLoading } = useStore(onBoardingStore, useShallow(state => ({
+        value: state.value,
+        isLoading: state.isLoading,
+        reset: state.reset,
+    })));
 
-
-
+    if (isLoading) return <LoadingState />;
+    if (!value)
+        return <Redirect href='/onboarding' />;
     if (!isSignedIn) return <Redirect href='/(auth)/sign-in' />;
     if (!isLoaded) return <LoadingState />;
 
