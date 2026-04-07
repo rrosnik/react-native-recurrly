@@ -3,8 +3,9 @@ import { NativeOnlyAnimatedView } from '@/components/ui/native-only-animated-vie
 import { TextClassContext } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 import * as AlertDialogPrimitive from '@rn-primitives/alert-dialog';
+import { BlurView } from 'expo-blur';
 import * as React from 'react';
-import { Platform, View, type ViewProps } from 'react-native';
+import { Platform, StyleSheet, View, type ViewProps } from 'react-native';
 import { FadeIn, FadeOut } from 'react-native-reanimated';
 import { FullWindowOverlay as RNFullWindowOverlay } from 'react-native-screens';
 
@@ -27,13 +28,19 @@ function AlertDialogOverlay({
     <FullWindowOverlay>
       <AlertDialogPrimitive.Overlay
         className={cn(
-          'absolute bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center bg-black/50 p-2',
+          'absolute bottom-0 left-0 right-0 top-0 z-50 flex items-center justify-center p-4',
           Platform.select({
-            web: 'animate-in fade-in-0 fixed',
+            web: 'animate-in fade-in-0 fixed bg-black/70 backdrop-blur-sm',
           }),
           className
         )}
+        // On native we render a BlurView behind the content and a subtle
+        // translucent tint for contrast.
+        style={Platform.OS === 'web' ? undefined : { backgroundColor: 'rgba(0,0,0,0.25)' }}
         {...props}>
+        {Platform.OS !== 'web' ? (
+          <BlurView intensity={80} tint="dark" style={StyleSheet.absoluteFill} />
+        ) : null}
         <NativeOnlyAnimatedView
           entering={FadeIn.duration(200).delay(50)}
           exiting={FadeOut.duration(150)}>

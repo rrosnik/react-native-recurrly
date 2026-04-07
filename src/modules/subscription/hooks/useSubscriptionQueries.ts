@@ -3,7 +3,6 @@
  * React Query hooks for subscription data fetching
  */
 
-import type { Subscription_Insert } from "@/db/schema";
 import { queryKeys } from "@/lib/query/queryKeys";
 import { subscriptionRepository } from "@/repositories/subscription";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -14,7 +13,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 export const useSubscriptions = () => {
   return useQuery({
     queryKey: queryKeys.subscriptions.lists(),
-    queryFn: subscriptionRepository.getAll,
+    queryFn: () => subscriptionRepository.getAll(),
   });
 };
 

@@ -5,10 +5,12 @@ import { HOME_BALANCE, HOME_SUBSCRIPTIONS, HOME_USER, UPCOMING_SUBSCRIPTIONS } f
 import { icons } from '@/constants/icons';
 import images from "@/constants/image";
 import { formatCurrency } from '@/lib/utils';
-import SubscriptionCard from '@/modules/subscription/ui/components/SubscriptionCard';
+import { useSubscriptions } from '@/modules/subscription/hooks/useSubscriptionQueries';
+import HomeSubscriptionCard from '@/modules/subscription/ui/components/HomeSubscriptionCard';
 import UpcomingSubscriptionCard from '@/modules/subscription/ui/components/UpcomingSubscriptionCard';
 import { useUser } from '@clerk/expo';
 import dayjs from 'dayjs';
+import { Link, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { FlatList, Image, Pressable, Text, View } from 'react-native';
 
@@ -16,10 +18,11 @@ import { FlatList, Image, Pressable, Text, View } from 'react-native';
 export default function App() {
   const { user } = useUser();
   const [expandedSubscriptionId, setExpandedSubscriptionId] = useState<string | null>(null);
+  const router = useRouter();
   const [subscriptions, setSubscriptions] = useState<Subscription[]>(HOME_SUBSCRIPTIONS);
-
+  const { data } = useSubscriptions();
   return (
-    <SafeAreaView  className='flex-1 dark:bg-accent bg-background  p-5' >
+    <SafeAreaView className='flex-1 dark:bg-accent bg-background  p-5' >
       <View className=''>
         <FlatList
           ListHeaderComponent={() => (<>
@@ -34,7 +37,9 @@ export default function App() {
               </View>
 
               <Pressable >
-                <Image source={icons.add} className='home-add-icon shrink-0' />
+                <Link href='/subscriptions/create' className='list-action-link' >
+                  <Image source={icons.add} className='home-add-icon shrink-0' />
+                </Link>
               </Pressable>
 
             </View>
@@ -48,7 +53,7 @@ export default function App() {
             </View>
 
             <View className=''>
-              <ListHeading title="Upcoming" />
+              <ListHeading title="Upcoming" actionTitle='view all' onActionPress={() => router.push('/subscriptions')} />
               <FlatList
                 keyExtractor={(item) => item.id}
                 horizontal
@@ -59,17 +64,17 @@ export default function App() {
               />
             </View>
 
-            <ListHeading title="All Subscriptions" />
+            <ListHeading title="All Subscriptions" actionTitle='view all' onActionPress={() => router.push('/subscriptions')} />
 
           </>)}
           keyExtractor={item => item.id}
-          data={subscriptions}
+          data={data || []}
           extraData={expandedSubscriptionId}
           showsVerticalScrollIndicator={false}
           ItemSeparatorComponent={() => (<View className='h-4' />)}
           ListEmptyComponent={<Text className='home-empty-state'>No subscriptions yet.</Text>}
           renderItem={({ item }) => (
-            <SubscriptionCard
+            <HomeSubscriptionCard
               {...item}
               expanded={item.id === expandedSubscriptionId}
               onPress={() => { setExpandedSubscriptionId(currentId => item.id === currentId ? null : item.id) }}

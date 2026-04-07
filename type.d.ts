@@ -1,6 +1,18 @@
 import type { ImageSourcePropType } from "react-native";
 
 declare global {
+  //#region subscription types
+
+  type Subscription = import("@/modules/subscription/types").Subscription;
+  type Subscription_Insert =
+    import("@/modules/subscription/types").Subscription_Insert;
+  type Subscription_Form =
+    import("@/modules/subscription/types").Subscription_Form;
+  type Subscription_Update =
+    import("@/modules/subscription/types").Subscription_Update;
+
+  //#endregion
+
   interface AppTab {
     name: string;
     title: string;
@@ -11,10 +23,6 @@ declare global {
     focused: boolean;
     icon: ImageSourcePropType;
   }
-
-  type Subscription = import("@/db/schema/subscriptions").Subscription;
-  type Subscription_Insert =
-    import("@/db/schema/subscriptions").Subscription_Insert;
 
   interface SubscriptionCardProps extends Omit<Subscription, "id"> {
     expanded: boolean;
@@ -36,10 +44,6 @@ declare global {
     UpcomingSubscription,
     "id"
   > {}
-
-  interface ListHeadingProps {
-    title: string;
-  }
 }
 
 export { };

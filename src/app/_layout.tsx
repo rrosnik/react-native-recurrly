@@ -1,20 +1,19 @@
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack } from "expo-router";
+import { Stack } from "expo-router";
+import * as SplashScreen from 'expo-splash-screen';
 
 import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from '@clerk/expo/token-cache';
 
 import "@/app/global.css";
 import ErrorState from '@/components/ErrorState';
-import { db } from '@/db';
-import migrations from '@/drizzle/migrations';
 import { PostHogProviderWrapper } from '@/lib/posthog/providers/PosthogProvider';
 import { AppQueryClientProvider } from '@/lib/query/QueryClientProvider';
 import { ThemeProvider } from '@/providers/them-provider';
-import { useMigrations } from 'drizzle-orm/expo-sqlite/migrator';
 import { useEffect } from 'react';
 
-SplashScreen.preventAutoHideAsync();
+import { PortalHost } from '@rn-primitives/portal';
+import 'react-native-get-random-values';
 
 export default function RootLayout() {
 
@@ -35,7 +34,7 @@ export default function RootLayout() {
 }
 
 const RootLayoutContent = () => {
-  const { success, error: errorMigrations } = useMigrations(db, migrations);
+  // const { success, error: errorMigrations } = useMigrations(db, migrations);
   const { isLoaded: authLoaded } = useAuth();
   const [fontsLoaded, errorFonts] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
@@ -47,25 +46,51 @@ const RootLayoutContent = () => {
   });
 
   useEffect(() => {
-    // hide the splash screen once fonts and auth state are loaded
-    if (fontsLoaded && authLoaded && success) {
-      SplashScreen.hideAsync()
-    }
-  }, [fontsLoaded, authLoaded, success]);
+    // prevent the splash screen from auto-hiding until we're ready
+    (async () => {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+      } catch (e) {
+        console.warn('Error preventing splash auto hide:', e);
+      }
+    })();
+  }, []);
 
-  if (errorMigrations) {
-    return <ErrorState title="Database Error" message="An error occurred while initializing the database. Please try restarting the app. If the issue persists, contact support." />
-  }
+  useEffect(() => {
+    // hide the splash screen once fonts and auth state are loaded
+    if (fontsLoaded && authLoaded) {
+      (async () => {
+        try {
+          await SplashScreen.hideAsync();
+        } catch (e) {
+          console.warn('Error hiding splash screen:', e);
+        }
+      })();
+    }
+  }, [fontsLoaded, authLoaded]);
+
+  // if (errorMigrations) {
+  //   return <ErrorState title="Database Error" message="An error occurred while initializing the database. Please try restarting the app. If the issue persists, contact support." />
+  // }
 
   if (errorFonts) {
     return <ErrorState title="Font Loading Error" message="An error occurred while loading fonts. Please try restarting the app. If the issue persists, contact support." />
   }
 
-  if (!fontsLoaded || !authLoaded || !success) return null;
+  if (!fontsLoaded || !authLoaded) return null;
 
   return (
     <AppQueryClientProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="subscriptions/create" options={{
+          presentation: "modal",
+          animation: "fade_from_bottom",
+          headerShown: false,
+          contentStyle: { backgroundColor: 'transparent' },
+        }} />
+      </Stack>
+      <PortalHost />
     </AppQueryClientProvider>
   )
 

@@ -1,2 +1,2 @@
-export * from "./subscriptions";
+export { subscriptions } from "@/modules/subscription/dbSchema/sqliteTableSchema";
 

@@ -4,11 +4,6 @@ import {
   sqliteTable,
   text,
 } from "drizzle-orm/sqlite-core";
-import {
-  createInsertSchema,
-  createSelectSchema,
-  createUpdateSchema,
-} from "drizzle-zod";
 import { nanoid } from "nanoid";
 import type { ImageSourcePropType } from "react-native";
 
@@ -47,21 +42,11 @@ export const subscriptions = sqliteTable("subscriptions", {
   plan: text("plan"),
   category: text("category"),
   paymentMethod: text("payment_method"),
-  status: text("status"),
+  status: text("status").default("active"),
   startDate: text("start_date"),
   price: numeric("price").notNull().$type<number>(),
-  currency: text("currency"),
+  currency: text("currency").default("CAD"),
   billing: text("billing").notNull(),
   renewalDate: text("renewal_date"),
   color: text("color"),
 });
-
-// Zod schemas for validation
-export const subscriptionCreateSchema = createInsertSchema(subscriptions);
-export const subscriptionUpdateSchema = createUpdateSchema(subscriptions);
-export const subscriptionSelectSchema = createSelectSchema(subscriptions);
-
-// Types for subscription records
-export type Subscription_Raw = typeof subscriptions.$inferSelect;
-export type Subscription_Insert = typeof subscriptions.$inferInsert;
-export type Subscription = Subscription_Raw;

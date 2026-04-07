@@ -58,10 +58,6 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                 // "overflow-hidden"
             )}
             style={{ bottom: safeInsets.bottom }}
-
-
-
-
         >
             {state.routes.map((route: any, index: number) => {
                 const isFocused = state.index === index;

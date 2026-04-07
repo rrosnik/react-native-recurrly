@@ -1,11 +1,37 @@
+import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@/constants/constants";
 import { db } from "@/db";
-import type { Subscription, Subscription_Insert } from "@/db/schema";
 import { subscriptions } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import {
+  subscriptionCreateSchema,
+  subscriptionUpdateSchema,
+} from "@/modules/subscription/schema";
+import { desc, eq, ilike } from "drizzle-orm";
 
 export const subscriptionRepository = {
-  getAll: async (): Promise<Subscription[]> => {
-    return await db.select().from(subscriptions).all();
+  getAll: async (
+    query: {
+      search?: string;
+      pageSize?: number;
+      page?: number;
+    } = {
+      pageSize: DEFAULT_PAGE_SIZE,
+      page: DEFAULT_PAGE,
+      search: "",
+    },
+  ): Promise<Subscription[]> => {
+    const { search, pageSize = DEFAULT_PAGE_SIZE, page = DEFAULT_PAGE } = query;
+    const offset = (page - 1) * pageSize;
+    const builder = db.select().from(subscriptions).$dynamic();
+    if (search) {
+      builder.where(
+        ilike(subscriptions.name, `%${search.replace(/%/g, "\\%")}%`),
+      );
+    }
+    return await builder
+      .limit(pageSize)
+      .offset(offset)
+      .orderBy(desc(subscriptions.renewalDate))
+      .all();
   },
 
   getById: async (id: string): Promise<Subscription> => {
@@ -19,20 +45,22 @@ export const subscriptionRepository = {
   },
 
   create: async (payload: Subscription_Insert): Promise<Subscription> => {
+    const validData = subscriptionCreateSchema.parse(payload);
     const [created] = await db
       .insert(subscriptions)
-      .values(payload)
+      .values(validData as any)
       .returning();
     return created;
   },
 
   update: async (
     id: string,
-    payload: Partial<Subscription_Insert>,
+    payload: Subscription_Update,
   ): Promise<Subscription> => {
+    const validData = subscriptionUpdateSchema.parse(payload);
     const [updated] = await db
       .update(subscriptions)
-      .set(payload)
+      .set(validData as any)
       .where(eq(subscriptions.id, id))
       .returning();
     if (!updated) throw new Error("Subscription not found");
