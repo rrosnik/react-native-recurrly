@@ -8,8 +8,8 @@ type OnboardingStorageState = {
   isSaving: boolean;
   readError: Error | null;
   writeError: Error | null;
-  setSeen: () => void;
-  reset: () => void;
+  setSeen: () => Promise<void>;
+  reset: () => Promise<void>;
 };
 
 export const onBoardingStore = createStore<OnboardingStorageState>((set) => {
@@ -51,12 +51,12 @@ export const onBoardingStore = createStore<OnboardingStorageState>((set) => {
 
   return {
     value: false,
-    isLoading: false,
+    isLoading: true,
     isSaving: false,
     readError: null,
     writeError: null,
 
-    setSeen: () => setSeen(),
-    reset: () => reset(),
+    setSeen: setSeen,
+    reset: reset,
   };
 });

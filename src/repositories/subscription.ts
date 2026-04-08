@@ -50,6 +50,7 @@ export const subscriptionRepository = {
       .insert(subscriptions)
       .values(validData as any)
       .returning();
+    if (!created) throw new Error("Failed to create subscription");
     return created;
   },
 
@@ -68,6 +69,18 @@ export const subscriptionRepository = {
   },
 
   delete: async (id: string): Promise<void> => {
-    await db.delete(subscriptions).where(eq(subscriptions.id, id));
+    const res = await db
+      .delete(subscriptions)
+      .where(eq(subscriptions.id, id))
+      .run();
+    // Drizzle's run may return an object with changes/rowCount depending on driver; handle common cases
+    const affected =
+      (res as any)?.changes ??
+      (res as any)?.rowCount ??
+      (res as any)?.affectedRows;
+    if (typeof affected === "number" && affected === 0) {
+      throw new Error("Subscription not found");
+    }
+    return;
   },
 };

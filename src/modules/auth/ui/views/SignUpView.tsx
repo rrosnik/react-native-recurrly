@@ -10,18 +10,15 @@ import EmailInput from '@/modules/auth/components/EmailInput'
 import PasswordInput from '@/modules/auth/components/PasswordInput'
 import { useSignup } from '@/modules/auth/hooks/useSignup'
 import { signUpSchema, verifyCodeSchema } from '@/modules/auth/schema.ts'
-import { useAuth } from '@clerk/expo'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link, useRouter } from 'expo-router'
+import { Link } from 'expo-router'
 import { CircleAlert } from 'lucide-react-native'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { ScrollView, View } from 'react-native'
 
 export default function SignUpView() {
-    const { isSignedIn } = useAuth()
     const { signUp, error, isFetching, status, reset, resendCode, verifyCode } = useSignup()
-    const router = useRouter()
 
 
     const signupForm = useForm({
@@ -152,7 +149,7 @@ export default function SignUpView() {
                                         <Label htmlFor='email-id' className='text-base font-sans-semibold'>Email</Label>
                                         <EmailInput
                                             id='email-id'
-                                            placeholder="First name"
+                                            placeholder="Email"
                                             onBlur={onBlur}
                                             onChangeText={onChange}
                                             value={value}

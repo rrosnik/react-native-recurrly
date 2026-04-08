@@ -24,6 +24,7 @@ export const useSubscription = (id: string) => {
   return useQuery({
     queryKey: queryKeys.subscriptions.detail(id),
     queryFn: () => subscriptionRepository.getById(id),
+    enabled: Boolean(id),
   });
 };
 
@@ -77,7 +78,13 @@ export const useDeleteSubscription = () => {
 
   return useMutation({
     mutationFn: (id: string) => subscriptionRepository.delete(id),
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
+      const id = typeof variables === "string" ? variables : undefined;
+      if (id) {
+        queryClient.invalidateQueries({
+          queryKey: queryKeys.subscriptions.detail(id),
+        });
+      }
       queryClient.invalidateQueries({
         queryKey: queryKeys.subscriptions.lists(),
       });

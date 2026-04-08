@@ -1,4 +1,4 @@
-import SubscriptionsView from '@/modules/subscription/ui/views/SupscriptionsView';
+import SubscriptionsView from '@/modules/subscription/ui/views/SubscriptionsView';
 import React from 'react';
 
 const Subscriptions = () => {

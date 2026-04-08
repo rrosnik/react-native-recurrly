@@ -90,7 +90,7 @@ export const useSignup = () => {
       // Check why the sign-up is not complete
       setError({ message: "Sign-up attempt not complete" });
     }
-  }, []);
+  }, [signUp, router, setError]);
 
   return {
     signUp: signUpWithEmail,

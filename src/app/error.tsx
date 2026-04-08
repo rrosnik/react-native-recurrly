@@ -26,6 +26,7 @@ export default function ErrorScreen() {
             title={title}
             message={message}
             actionTitle={actionTitle}
+            onAction={handleAction}
         />
     );
 }

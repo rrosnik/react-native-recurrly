@@ -12,7 +12,7 @@ export const CreateSubscriptionContext = createContext<CreateSubscriptionContext
 
 export const CreateSubscriptionProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [onSubmit, setOnSubmit] = useState<(subscription: Subscription) => void>(() => { });
+  const [onSubmit, setOnSubmit] = useState<(subscription: Subscription) => void>(() => () => {});
 
   return (
     <CreateSubscriptionContext.Provider

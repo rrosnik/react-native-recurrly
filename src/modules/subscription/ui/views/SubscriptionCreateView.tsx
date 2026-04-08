@@ -16,8 +16,6 @@ interface CreateSubscriptionModalProps {
   onClose: () => void;
 }
 
-type Frequency = 'Monthly' | 'Yearly';
-
 const CATEGORIES = ['Entertainment', 'AI Tools', 'Developer Tools', 'Design', 'Productivity', 'Cloud', 'Music', 'Other'] as const;
 
 const CATEGORY_COLORS: Record<Subscription_Insert["category"], string> = {
@@ -31,13 +29,12 @@ const CATEGORY_COLORS: Record<Subscription_Insert["category"], string> = {
   'Other': '#d4c5b9',
 };
 export default function SubscriptionCreateView({ onClose }: CreateSubscriptionModalProps) {
-  const { error, mutateAsync: createSubscription } = useCreateSubscription();
+  const { mutateAsync: createSubscription } = useCreateSubscription();
 
   const form = useForm({
     defaultValues: { name: "", price: "", category: undefined, billing: undefined },
     resolver: zodResolver(subscriptionFormSchema)
   })
-
 
 
   const handleSubmit = form.handleSubmit((data) => {
@@ -93,11 +90,13 @@ export default function SubscriptionCreateView({ onClose }: CreateSubscriptionMo
   console.log("Form Errors:", form.getValues());
   return (
     <View className="flex-1 bg-background" >
-      <KeyboardAvoidingView behavior="padding" className="flex-1" >
+      <KeyboardAvoidingView behavior="padding" className="flex-1">
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
           bounces={false}
+          keyboardDismissMode='on-drag'
+          
         >
           {/* Header */}
           <View className="modal-header">

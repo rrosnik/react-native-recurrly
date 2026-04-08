@@ -83,7 +83,7 @@ export const useLogin = () => {
         setError({ message: "Sign-in attempt not complete" });
       }
     },
-    [signIn, router],
+    [signIn, router, posthog],
   );
 
   const reset = useCallback(() => {
@@ -139,7 +139,7 @@ export const useLogin = () => {
         }
       }
     },
-    [signIn, status, router],
+      [signIn, status, router, posthog],
   );
 
   return {

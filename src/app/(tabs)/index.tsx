@@ -36,7 +36,7 @@ export default function App() {
                 </View>
               </View>
 
-              <Pressable >
+              <Pressable onPress={() => router.push('/subscriptions/create')}>
                 <Link href='/subscriptions/create' className='list-action-link' >
                   <Image source={icons.add} className='home-add-icon shrink-0' />
                 </Link>

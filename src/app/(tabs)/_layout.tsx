@@ -78,6 +78,12 @@ const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigat
                         key={route.key}
                         onPress={onPress}
                         className="flex-1 items-center justify-center"
+                        accessibilityState={{ selected: isFocused }}
+                        accessibilityLabel={options.tabBarAccessibilityLabel ?? route.name}
+                        testID={options.tabBarButtonTestID ?? route.key}
+                        onLongPress={() => {
+                            navigation.emit({ type: 'tabLongPress', target: route.key });
+                        }}
 
                     >
                         {options.tabBarIcon ? options.tabBarIcon({ focused: isFocused, color: '#fff', size: tabBar.iconFrame }) : null}
@@ -96,9 +102,6 @@ const tabScreens = () => tabs.map((tab) => (
         options={{
             tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon={tab.icon} />,
         }}
-        initialParams={{
-            hamid: "asdasdasd"
-        }}
     />
 ))
 const TabLayout = () => {
@@ -109,11 +112,10 @@ const TabLayout = () => {
         reset: state.reset,
     })));
 
-    if (isLoading) return <LoadingState />;
-    if (!value)
-        return <Redirect href='/onboarding' />;
-    if (!isSignedIn) return <Redirect href='/(auth)/sign-in' />;
     if (!isLoaded) return <LoadingState />;
+    if (isLoading) return <LoadingState />;
+    if (!value) return <Redirect href='/onboarding' />;
+    if (!isSignedIn) return <Redirect href='/(auth)/sign-in' />;
 
     return (
         <>

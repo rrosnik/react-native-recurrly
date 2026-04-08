@@ -12,6 +12,8 @@ type ErrorStateProps = {
     message?: string;
     actionTitle?: string;
     secondaryActionTitle?: string;
+    onAction?: () => void;
+    primaryHref?: string;
 };
 
 const ErrorState: React.FC<ErrorStateProps> = ({
@@ -19,6 +21,8 @@ const ErrorState: React.FC<ErrorStateProps> = ({
     message = 'An unexpected error occurred. Please try again.',
     actionTitle = 'Retry',
     secondaryActionTitle = 'Close',
+    onAction,
+    primaryHref,
 }) => {
     const router = useRouter();
     return (
@@ -35,7 +39,21 @@ const ErrorState: React.FC<ErrorStateProps> = ({
                 <Text className="text-center text-muted-foreground max-w-80">{message}</Text>
 
                 <View className="flex-row gap-3 mt-4">
-                    <Button onPress={() => router.replace("/(tabs)")} variant="accent" size="lg">
+                    <Button
+                        onPress={() => {
+                            if (onAction) {
+                                onAction();
+                                return;
+                            }
+                            if (primaryHref) {
+                                router.replace(primaryHref as Parameters<ReturnType<typeof useRouter>["replace"]>[0]);
+                                return;
+                            }
+                            router.replace("/(tabs)");
+                        }}
+                        variant="accent"
+                        size="lg"
+                    >
                         <Text className="text-white font-semibold">{actionTitle}</Text>
                     </Button>
                     <Button

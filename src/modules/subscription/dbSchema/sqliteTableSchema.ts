@@ -15,18 +15,21 @@ const iconType = customType<{
   dataType: () => "text",
   fromDriver: (value: string): ImageSourcePropType => {
     if (!value) {
-      return { uri: "" } as ImageSourcePropType;
-    } else {
-      try {
-        const parsed = JSON.parse(value);
-        return parsed as ImageSourcePropType;
-      } catch {
-        return { uri: value } as ImageSourcePropType;
+      throw new Error("Missing or empty icon payload in database");
+    }
+    try {
+      const parsed = JSON.parse(value);
+      if (!parsed) throw new Error("Invalid parsed icon payload");
+      return parsed as ImageSourcePropType;
+    } catch {
+      if (value.trim() === "") {
+        throw new Error("Invalid icon payload in database");
       }
+      return { uri: value } as ImageSourcePropType;
     }
   },
   toDriver: (value: ImageSourcePropType) => {
-    if (!value) return "";
+    if (!value) throw new Error("Attempted to persist empty icon payload");
     return JSON.stringify(value);
   },
 });
@@ -44,7 +47,7 @@ export const subscriptions = sqliteTable("subscriptions", {
   paymentMethod: text("payment_method"),
   status: text("status").default("active"),
   startDate: text("start_date"),
-  price: numeric("price").notNull().$type<number>(),
+  price: numeric("price", { mode: "number" }).notNull(),
   currency: text("currency").default("CAD"),
   billing: text("billing").notNull(),
   renewalDate: text("renewal_date"),

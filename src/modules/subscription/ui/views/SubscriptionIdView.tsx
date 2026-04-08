@@ -2,11 +2,11 @@ import { Link } from 'expo-router';
 import React from 'react';
 import { Text, View } from 'react-native';
 
-type props = {
+type Props = {
     id: string;
 }
 
-export default function SubscriptionIdView({ id }: props) {
+export default function SubscriptionIdView({ id }: Props) {
     return (
         <View>
             <Text>SubscriptionDetails</Text>

@@ -16,7 +16,7 @@ import { Link } from 'expo-router'
 import { CircleAlert } from 'lucide-react-native'
 import React from 'react'
 import { Controller, useForm } from 'react-hook-form'
-import { ScrollView, StyleSheet, View } from 'react-native'
+import { ScrollView, View } from 'react-native'
 
 export default function SignInView() {
     const { login, error, isFetching, status, reset, resendCode, verifyCode } = useLogin();
@@ -190,21 +190,3 @@ export default function SignInView() {
         </ScrollView>
     )
 }
-
-const styles = StyleSheet.create({
-
-
-    button: {
-        backgroundColor: '#0a7ea4',
-        paddingVertical: 12,
-        paddingHorizontal: 24,
-        borderRadius: 8,
-        alignItems: 'center',
-        marginTop: 8,
-    },
-
-
-
-
-
-})

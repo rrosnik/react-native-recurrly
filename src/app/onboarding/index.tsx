@@ -13,7 +13,11 @@ const OnBoardingPage = () => {
     })));
 
     const handleDone = async () => {
-        await setSeen();
+        try {
+            await setSeen();
+        } catch (e) {
+            console.error('Failed to set onboarding seen:', e);
+        }
         router.replace('/(tabs)');
     };
 

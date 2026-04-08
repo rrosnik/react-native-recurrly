@@ -34,18 +34,18 @@ export default function SubscriptionCard({ data, expanded, onCancel, onPress }: 
             {
                 expanded && (
                     <View className='mt-4 gap-4'>
-                        <View className='flex-row items-center justify-between'>
-                            <View className='flex-row items-center gap-2'>
+                        <View className='flex-row items-center justify-between gap-2'>
+                            <View className='flex-row items-center gap-2 shrink overflow-hidden'>
                                 <Text className='text-muted-foreground'>Payment info:</Text>
-                                <Text className='font-sans-bold'>{data.paymentMethod ?? "Not Provided"}</Text>
+                                <Text className='font-sans-bold shrink' numberOfLines={1} ellipsizeMode='head' >{data.paymentMethod ?? "Not Provided"}</Text>
                             </View>
                             <TouchableOpacity className='border border-foreground  rounded-full px-4 py-2'><Text className='font-sans-bold'>Manage</Text>
                             </TouchableOpacity>
                         </View>
-                        <View className='flex-row items-center justify-between'>
-                            <View className='flex-row items-center gap-2'>
+                        <View className='flex-row items-center justify-between gap-2'>
+                            <View className='flex-row items-center gap-2 shrink overflow-hidden'>
                                 <Text className='text-muted-foreground'>Plan details:</Text>
-                                <Text className='font-sans-bold'>{data.plan ?? "Not Provided"}</Text>
+                                <Text className='font-sans-bold shrink' numberOfLines={1} ellipsizeMode='head' >{data.plan ?? "Not Provided"}</Text>
                             </View>
                             <TouchableOpacity className='border border-foreground  rounded-full px-4 py-2'>
                                 <Text className='font-sans-bold'>Change</Text>
