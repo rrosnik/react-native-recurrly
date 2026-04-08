@@ -1,10 +1,11 @@
 import { formatCurrency, formatStatusLabel, formatSubscriptionDateTime } from '@/lib/utils';
 import clsx from 'clsx';
 import React from 'react';
-import { Image, Pressable, Text, View } from 'react-native';
+import { Image, ImageSourcePropType, Pressable, Text, View } from 'react-native';
 
-const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps) => {
+const HomeSubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps) => {
     const fallback = "Not Provided";
+    const icon: ImageSourcePropType = typeof data.icon === 'string' ? { uri: data.icon } : data.icon as ImageSourcePropType;
     return (
         <Pressable onPress={onPress} className={clsx("sub-card",
             expanded ? "sub-card-expanded" : "bg-card"
@@ -15,7 +16,7 @@ const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps)
         >
             <View className='sub-head'>
                 <View className='sub-main'>
-                    <Image source={data.icon} className='sub-icon' />
+                    <Image source={icon} className='sub-icon' />
                     <View className='sub-copy'>
                         <Text numberOfLines={1} className='sub-title'>{data.name}</Text>
                         <Text numberOfLines={1} ellipsizeMode='tail' className='sub-meta'>{
@@ -25,7 +26,7 @@ const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps)
                     </View>
                 </View>
                 <View className='sub-price-box'>
-                    <Text className='sub-price'>{formatCurrency(data.price, data.currency)}</Text>
+                    <Text className='sub-price'>{formatCurrency(data.price, data.currency ?? "CAD")}</Text>
                     <Text className='sub-billing'>{data.billing}</Text>
                 </View>
             </View>
@@ -76,4 +77,4 @@ const SubscriptionCard = ({ expanded, onPress, ...data }: SubscriptionCardProps)
     )
 }
 
-export default SubscriptionCard;
+export default HomeSubscriptionCard;

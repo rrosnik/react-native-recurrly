@@ -1,34 +1,43 @@
 import { cn } from '@/lib/utils';
-import { Platform, TextInput } from 'react-native';
+import { cva, VariantProps } from 'class-variance-authority';
+import { TextInput } from 'react-native';
 
-type InputProps = React.ComponentProps<typeof TextInput> & {
-  isValid?: boolean;
-};
 
-function Input({ className, isValid, ...props }: InputProps) {
+
+const inputVariants = cva(
+  cn(
+    "border border-foreground/20 rounded-2xl",
+    "text-base leading-5 font-sans-medium text-foreground placeholder:text-muted-foreground/50",
+    "flex flex-row items-center bg-background",
+    "h-[3.5em] w-full min-w-0 px-[1em] sm:h-12",
+    "shadow-sm shadow-black/5",
+  ), {
+  variants: {
+    variant: {
+      default: '',
+      error: 'border-destructive',
+      success: 'border-emerald-500',
+    },
+
+  },
+  defaultVariants: {
+    variant: 'default',
+
+  }
+}
+);
+
+type InputProps = React.ComponentProps<typeof TextInput> & VariantProps<typeof inputVariants> & {
+  isvalid?: boolean;
+}
+
+function Input({ className, variant: _variant, isvalid, ...props }: InputProps) {
+  const variant = isvalid === true ? 'success' : isvalid === false ? 'error' : _variant;
+
   return (
     <TextInput
-      className={cn(
-        'border-input bg-background text-foreground flex h-[3.5em] w-full min-w-0 flex-row items-center rounded-2xl border px-[1em] text-base leading-5 shadow-sm shadow-black/5 sm:h-12',
-        props.editable === false &&
-        cn(
-          'opacity-50',
-          Platform.select({ web: 'disabled:pointer-events-none disabled:cursor-not-allowed' })
-        ),
-        Platform.select({
-          web: cn(
-            'placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground outline-none transition-[color,box-shadow] md:text-sm',
-            'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-            'aria-invalid:ring-destructive/20 aria-invalid:border-destructive'
-          ),
-          native: 'placeholder:text-muted-foreground/50',
-        }),
-        cn(
-          isValid === false ? 'border-destructive' : isValid === true ? 'border-emerald-700' : 'border-gray-400'
-        ),
-        className
-      )}
-      placeholderTextColor={'#666666'}
+      placeholderTextColor={variant === 'error' ? '#ff7675bb' : variant === 'success' ? '#28a745bb' : '#666666'}
+      className={cn(inputVariants({ variant }), className)}
       {...props}
     />
   );

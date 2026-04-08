@@ -1,13 +1,6 @@
-import { SafeAreaView } from '@/components/SafeAreaView';
+import { MonthlyInsightsScreen } from '@/modules/insights/ui/MonthlyInsightsScreen';
 import React from 'react';
-import { Text } from 'react-native';
 
-const Insights = () => {
-    return (
-        <SafeAreaView className='flex-1 bg-background p-5'>
-            <Text>insights</Text>
-        </SafeAreaView>
-    )
+export default function InsightsTab() {
+  return <MonthlyInsightsScreen showBackButton={false} />;
 }
-
-export default Insights;

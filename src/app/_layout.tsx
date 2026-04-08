@@ -1,15 +1,19 @@
 import { useFonts } from "expo-font";
-import { SplashScreen, Stack, useGlobalSearchParams, usePathname, } from "expo-router";
+import { Stack } from "expo-router";
+import * as SplashScreen from 'expo-splash-screen';
 
 import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from '@clerk/expo/token-cache';
 
 import "@/app/global.css";
-import { PostHogProviderWrapper } from '@/modules/posthog/providers/PosthogProvider';
-import { ThemeProvider } from '@/modules/theme/providers/them-provider';
-import { useEffect, useRef } from 'react';
+import ErrorState from '@/components/ErrorState';
+import { PostHogProviderWrapper } from '@/lib/posthog/providers/PosthogProvider';
+import { AppQueryClientProvider } from '@/lib/query/QueryClientProvider';
+import { ThemeProvider } from '@/providers/them-provider';
+import { useEffect } from 'react';
 
-SplashScreen.preventAutoHideAsync();
+import { PortalHost } from '@rn-primitives/portal';
+import 'react-native-get-random-values';
 
 export default function RootLayout() {
 
@@ -30,33 +34,9 @@ export default function RootLayout() {
 }
 
 const RootLayoutContent = () => {
+  // const { success, error: errorMigrations } = useMigrations(db, migrations);
   const { isLoaded: authLoaded } = useAuth();
-  const pathname = usePathname();
-  const params = useGlobalSearchParams();
-  const previousPathname = useRef<string | undefined>(undefined);
-
-
-  useEffect(() => {
-    if (previousPathname.current !== pathname) {
-      // Filter route params to avoid leaking sensitive data
-      const sanitizedParams = Object.keys(params).reduce((acc, key) => {
-        // Only include specific safe params
-        if (['id', 'tab', 'view'].includes(key)) {
-          acc[key] = params[key];
-        }
-        return acc;
-      }, {} as Record<string, string | string[]>);
-
-      // posthog.screen(pathname, {
-      //   previous_screen: previousPathname.current ?? null,
-      //   ...sanitizedParams,
-      // });
-      previousPathname.current = pathname;
-    }
-  }, [pathname, params]);
-
-
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, errorFonts] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
     'sans-bold': require("../assets/fonts/PlusJakartaSans-Bold.ttf"),
     'sans-medium': require("../assets/fonts/PlusJakartaSans-Medium.ttf"),
@@ -66,14 +46,61 @@ const RootLayoutContent = () => {
   });
 
   useEffect(() => {
+    // prevent the splash screen from auto-hiding until we're ready
+    (async () => {
+      try {
+        await SplashScreen.preventAutoHideAsync();
+      } catch (e) {
+        console.warn('Error preventing splash auto hide:', e);
+      }
+    })();
+  }, []);
+
+  useEffect(() => {
     // hide the splash screen once fonts and auth state are loaded
     if (fontsLoaded && authLoaded) {
-      SplashScreen.hideAsync()
+      (async () => {
+        try {
+          await SplashScreen.hideAsync();
+        } catch (e) {
+          console.warn('Error hiding splash screen:', e);
+        }
+      })();
     }
   }, [fontsLoaded, authLoaded]);
 
+  // if (errorMigrations) {
+  //   const retryMigrations = () => {
+  //     // placeholder: re-run migration logic or reload the app
+  //     // implement specifics when migration hook is restored
+  //     console.warn('Retry migrations requested');
+  //   };
+  //   return <ErrorState title="Database Error" message="An error occurred while initializing the database. Please try restarting the app. If the issue persists, contact support." onAction={retryMigrations} actionTitle="Retry" />
+  // }
+
+  if (errorFonts) {
+    const retryFonts = () => {
+      // re-trigger font load by re-mounting component; simple approach: reload JS bundle
+      console.warn('Retry fonts requested');
+    };
+    return <ErrorState title="Font Loading Error" message="An error occurred while loading fonts. Please try restarting the app. If the issue persists, contact support." onAction={retryFonts} actionTitle="Retry" />
+  }
+
   if (!fontsLoaded || !authLoaded) return null;
+
   return (
-    <Stack screenOptions={{ headerShown: false }} />
+    <AppQueryClientProvider>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="subscriptions/create" options={{
+          presentation: "modal",
+          animation: "fade_from_bottom",
+          headerShown: false,
+          contentStyle: { backgroundColor: 'transparent' },
+        }} />
+      </Stack>
+      <PortalHost />
+    </AppQueryClientProvider>
   )
+
 }

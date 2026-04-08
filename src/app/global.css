@@ -111,22 +111,6 @@
 }
 
 @layer components {
-  .tabs-icon {
-    @apply size-12 items-center justify-center;
-  }
-
-  .tabs-pill {
-    @apply size-12 items-center justify-center rounded-full bg-transparent;
-  }
-
-  .tabs-active {
-    @apply bg-accent;
-  }
-
-  .tabs-glyph {
-    @apply size-6;
-  }
-
   .home-header {
     @apply mb-2.5 flex-row items-center justify-between;
   }
@@ -351,16 +335,8 @@
     @apply gap-4;
   }
 
-  .auth-field {
-    @apply gap-2;
-  }
-
   .auth-label {
     @apply text-sm font-sans-semibold text-primary;
-  }
-
-  .auth-input {
-    @apply rounded-2xl border border-border bg-background px-4 py-4 text-base font-sans-medium text-primary;
   }
 
   .auth-input-error {
@@ -417,10 +393,6 @@
 
   .auth-link {
     @apply text-sm font-sans-bold text-accent;
-  }
-
-  .modal-overlay {
-    @apply flex-1 bg-black/50;
   }
 
   .modal-container {

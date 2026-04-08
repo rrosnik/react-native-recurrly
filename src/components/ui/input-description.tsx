@@ -9,7 +9,7 @@ const variants = cva(cn(
   variants: {
     variant: {
       default: cn(),
-      destructive: cn("text-destructive"),
+      destructive: cn("text-destructive/70"),
     },
     size: {
       "default": "text-base",

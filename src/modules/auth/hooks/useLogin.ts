@@ -52,7 +52,7 @@ export const useLogin = () => {
             posthog.capture("user_logged_in", {
               method: "email_code_mfa",
             });
-            router.push("/(tabs)");
+            router.replace("/(tabs)");
           },
         });
       } else if (signIn.status === "needs_second_factor") {
@@ -83,7 +83,7 @@ export const useLogin = () => {
         setError({ message: "Sign-in attempt not complete" });
       }
     },
-    [signIn, router],
+    [signIn, router, posthog],
   );
 
   const reset = useCallback(() => {
@@ -126,7 +126,7 @@ export const useLogin = () => {
               posthog.capture("user_logged_in", {
                 method: "email_code_mfa",
               });
-              router.push("/(tabs)");
+              router.replace("/(tabs)");
             },
           });
           if (error) {
@@ -139,7 +139,7 @@ export const useLogin = () => {
         }
       }
     },
-    [signIn, status, router],
+      [signIn, status, router, posthog],
   );
 
   return {

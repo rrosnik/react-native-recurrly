@@ -1,15 +1,17 @@
 import { tabs } from '@/constants/data';
-import clsx from "clsx";
+import type { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { Redirect, Tabs } from 'expo-router';
-import React, { createContext, useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, Image, StatusBar, Text, View } from 'react-native';
+import React, { createContext } from 'react';
+import { Image, ImageSourcePropType, Pressable, StatusBar, View } from 'react-native';
 
-import CreateSubscriptionModal from '@/components/CreateSubscriptionModal';
-import { SafeAreaView } from '@/components/SafeAreaView';
-import { colors, components } from "@/constants/theme";
-import { hasSeenOnboarding } from '@/lib/utils';
+import LoadingState from '@/components/LoadingState';
+import { components } from "@/constants/theme";
+import { cn } from '@/lib/utils';
+import { onBoardingStore } from '@/modules/onboarding/hooks/useOnBoardingStorage';
 import { useAuth } from '@clerk/expo';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useStore } from 'zustand';
+import { useShallow } from 'zustand/react/shallow';
 
 export const SubscriptionModalContext = createContext<{
     isModalVisible: boolean;
@@ -28,106 +30,108 @@ export const useSubscriptionModal = () => {
 
 const tabBar = components.tabBar;
 
-const TabLayout = () => {
-    const { isSignedIn, isLoaded } = useAuth()
-    const [isModalVisible, setIsModalVisible] = useState(false);
-    const [subscriptionCallback, setSubscriptionCallback] = useState<(subscription: Subscription) => void>(() => { });
-    const [seenOnboarding, setSeenOnboarding] = useState<boolean | null>(null);
 
-    const insets = useSafeAreaInsets();
 
-    React.useEffect(() => {
-        const checkOnboarding = async () => {
-            const hasSeen = await hasSeenOnboarding();
-            setSeenOnboarding(hasSeen);
-        };
-        checkOnboarding();
-    }, []);
-    const TabIcon = ({ focused, icon }: TabIconProps) => {
-        return (<View className='tabs-icon'>
-            <View className={clsx("tabs-pill", focused && "tabs-active")}>
-                <Image source={icon} className='tabs-glyph' resizeMode='contain' />
+type TabIconProps = { focused: boolean; icon: ImageSourcePropType };
+
+const TabIcon = React.memo(({ focused, icon }: TabIconProps) => {
+    return (
+        <View className='size-14 items-center justify-center rounded-full '>
+            <View className={cn('size-full items-center justify-center rounded-full',
+                focused && 'bg-accent')}>
+                <Image source={icon} className='size-7' resizeMode='contain' />
             </View>
-        </View>);
+        </View>
+    );
+}, (prevProps, nextProps) => {
+    return prevProps.focused === nextProps.focused && prevProps.icon === nextProps.icon;
+});
 
-    }
-
-    const handleSetOnSubmitCallback = useCallback((callback: (subscription: Subscription) => void) => {
-        setSubscriptionCallback(() => callback);
-    }, []);
-
-    const contextValue = useMemo(() => ({
-        isModalVisible,
-        openModal: () => setIsModalVisible(true),
-        closeModal: () => setIsModalVisible(false),
-        setOnSubmitCallback: handleSetOnSubmitCallback,
-    }), [isModalVisible, handleSetOnSubmitCallback]);
-
-    if (!isLoaded || seenOnboarding === null) {
-        return (
-            <SafeAreaView className='flex-1 items-center justify-center bg-accent'>
-                <Text className='text-foreground text-2xl'>Loading...</Text>
-                <ActivityIndicator className='mt-2' size="large" color="#666666" />
-            </SafeAreaView>
-        )
-    }
-
-    if (!isSignedIn) {
-        return <Redirect href="/(auth)/sign-in" />
-    }
-
-    if (!seenOnboarding) {
-        return <Redirect href="/onboarding" />
-    }
+const CustomTabBar: React.FC<BottomTabBarProps> = ({ state, descriptors, navigation }) => {
+    const safeInsets = useSafeAreaInsets();
 
     return (
-        <SubscriptionModalContext.Provider
-            value={contextValue}
+        <View
+            className={cn("absolute h-20  flex-row items-center  mx-5 p-0 rounded-full bg-primary",
+                `left-0 right-0 bottom-[${safeInsets.bottom}px]`,
+                "shadow-lg shadow-black/10",
+                // "overflow-hidden"
+            )}
+            style={{ bottom: safeInsets.bottom }}
         >
-            <StatusBar barStyle="dark-content" backgroundColor="white" />
-            <Tabs screenOptions={{
-                headerShown: false,
-                tabBarShowLabel: false,
-                tabBarStyle: {
-                    position: "absolute",
-                    bottom: Math.max(insets.bottom, tabBar.horizontalInset),
-                    height: tabBar.height,
-                    marginHorizontal: tabBar.horizontalInset,
-                    borderRadius: tabBar.radius,
-                    backgroundColor: colors.primary,
-                    borderTopWidth: 0,
-                    elevation: 0
-                },
-                tabBarItemStyle: {
-                    paddingVertical: tabBar.height / 2 - tabBar.iconFrame / 1.6
+            {state.routes.map((route: any, index: number) => {
+                const isFocused = state.index === index;
+                const { options } = descriptors[route.key];
+                const onPress = () => {
+                    const event = navigation.emit({
+                        type: 'tabPress',
+                        target: route.key,
+                        canPreventDefault: true,
+                    });
+                    if (!isFocused && !event.defaultPrevented) {
+                        navigation.navigate(route.name);
+                    }
+                };
 
-                },
-                tabBarIconStyle: {
-                    width: tabBar.iconFrame,
-                    height: tabBar.iconFrame,
-                    alignItems: "center"
-                }
-            }}>
-                {tabs.map(tab => (
-                    <Tabs.Screen key={tab.name} name={tab.name} options={{
-                        tabBarIcon: ({ focused }) => (
-                            <TabIcon key={tab.name} focused={focused} icon={tab.icon} />
-                        )
-                    }} />
-                ))}
-            </Tabs>
+                return (
+                    <Pressable
+                        key={route.key}
+                        onPress={onPress}
+                        className="flex-1 items-center justify-center"
+                        accessibilityState={{ selected: isFocused }}
+                        accessibilityLabel={options.tabBarAccessibilityLabel ?? route.name}
+                        testID={options.tabBarButtonTestID ?? route.key}
+                        onLongPress={() => {
+                            navigation.emit({ type: 'tabLongPress', target: route.key });
+                        }}
 
-            <CreateSubscriptionModal
-                visible={isModalVisible}
-                onClose={() => setIsModalVisible(false)}
-                onSubmit={(subscription) => {
-                    subscriptionCallback(subscription);
-                    setIsModalVisible(false);
+                    >
+                        {options.tabBarIcon ? options.tabBarIcon({ focused: isFocused, color: '#fff', size: tabBar.iconFrame }) : null}
+                    </Pressable>
+                );
+            })}
+        </View>
+    );
+};
+
+
+const tabScreens = () => tabs.map((tab) => (
+    <Tabs.Screen
+        key={tab.name}
+        name={tab.name}
+        options={{
+            tabBarIcon: ({ focused }) => <TabIcon focused={focused} icon={tab.icon} />,
+        }}
+    />
+))
+const TabLayout = () => {
+    const { isSignedIn, isLoaded } = useAuth();
+    const { value, isLoading } = useStore(onBoardingStore, useShallow(state => ({
+        value: state.value,
+        isLoading: state.isLoading,
+        reset: state.reset,
+    })));
+
+    if (!isLoaded) return <LoadingState />;
+    if (isLoading) return <LoadingState />;
+    if (!value) return <Redirect href='/onboarding' />;
+    if (!isSignedIn) return <Redirect href='/(auth)/sign-in' />;
+
+    return (
+        <>
+            <StatusBar barStyle='dark-content' backgroundColor='white' />
+            <Tabs
+                screenOptions={{
+                    headerShown: false,
+                    tabBarShowLabel: false,
                 }}
-            />
-        </SubscriptionModalContext.Provider>
-    )
-}
+                tabBar={(props: BottomTabBarProps) => <CustomTabBar {...props} />}
 
+            >
+                {tabScreens()}
+            </Tabs>
+        </>
+    );
+};
 
 export default TabLayout;

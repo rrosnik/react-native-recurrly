@@ -10,3 +10,5 @@ const events = [
 
   "subscription_details_viewed",
 ];
+
+export default events;

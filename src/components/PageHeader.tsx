@@ -1,4 +1,5 @@
 import { cn } from '@/lib/utils'
+import { navigate } from 'expo-router/build/global-state/routing'
 import { ChevronLeftIcon, MoreHorizontalIcon } from 'lucide-react-native'
 import React from 'react'
 import { Text, View } from 'react-native'
@@ -24,7 +25,7 @@ type PageHeaderProps = {
 export default function PageHeader({ title, className, ...props }: React.ComponentProps<typeof View> & PageHeaderProps) {
     return (
         <View  {...props} className={cn('flex-row items-center justify-between', className)}>
-            <ActionIcon icon={ChevronLeftIcon} />
+            <ActionIcon icon={ChevronLeftIcon} onPress={() => navigate("..")} />
             <View>
                 <Text className='text-2xl font-bold text-foreground'>{title}</Text>
             </View>
