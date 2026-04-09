@@ -3,11 +3,13 @@ import {
   createSelectSchema,
   createUpdateSchema,
 } from "drizzle-zod";
+import type { ImageSourcePropType } from "react-native";
 import z from "zod";
 import { subscriptions } from "./dbSchema/sqliteTableSchema";
 
 // Zod schemas for validation
 export const subscriptionCreateSchema = createInsertSchema(subscriptions, {
+  icon: z.custom<ImageSourcePropType>(),
   name: z.string().min(1, "Name is required"),
   price: z.number().positive("Price must be a positive number"),
   category: z.enum(

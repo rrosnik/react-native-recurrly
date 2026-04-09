@@ -13,6 +13,7 @@ import { ThemeProvider } from '@/providers/them-provider';
 import { useEffect } from 'react';
 
 import { PortalHost } from '@rn-primitives/portal';
+
 import 'react-native-get-random-values';
 
 export default function RootLayout() {
@@ -34,7 +35,6 @@ export default function RootLayout() {
 }
 
 const RootLayoutContent = () => {
-  // const { success, error: errorMigrations } = useMigrations(db, migrations);
   const { isLoaded: authLoaded } = useAuth();
   const [fontsLoaded, errorFonts] = useFonts({
     'sans-regular': require("../assets/fonts/PlusJakartaSans-Regular.ttf"),
@@ -55,6 +55,8 @@ const RootLayoutContent = () => {
       }
     })();
   }, []);
+
+
 
   useEffect(() => {
     // hide the splash screen once fonts and auth state are loaded
